@@ -24,8 +24,8 @@ class imuDriverNode(Node):
 
         # 参数
         self.declare_parameter("port", "/dev/imu_usb")
-        self.declare_parameter("baudrate", 921600)
-        self.declare_parameter("protocol", "TTL_STD")
+        self.declare_parameter("baudrate", 230400)
+        self.declare_parameter("protocol", "RS485_HIGH")
         self.declare_parameter("modbusID", 0x50)
 
         self.port = self.get_parameter("port").value
