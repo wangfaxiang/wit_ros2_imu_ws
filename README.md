@@ -219,8 +219,7 @@ ros2 topic hz /imu/data
 | `show_axes` | `true` | 是否显示本体坐标轴箭头 |
 | `axis_length` | `0.25` | 坐标轴长度 |
 | `axis_shaft_diameter` | `0.012` | 箭头杆直径 |
-| `axis_head_diameter` | `0.030` | 箭头头部直径 |
-| `axis_head_length` | `0.05` | 箭头头部长度 |
+| `axis_head_diameter` | `0.030` | 箭头头部直径（`Marker.ARROW` 的头部长度由该值自动决定） |
 | `smoothing` | `1.0` | 姿态 slerp 平滑系数，`1.0` 为不平滑，越小越平滑 |
 | `marker_lifetime` | `0.5` | Marker 存活时间（秒），IMU 断流后模型自动消失；`0` 表示永久 |
 

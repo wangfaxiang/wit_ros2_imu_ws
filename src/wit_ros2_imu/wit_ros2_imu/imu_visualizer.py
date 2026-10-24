@@ -66,6 +66,21 @@ def yawQuaternion(yaw):
     return (0.0, 0.0, math.sin(half), math.cos(half))
 
 
+def pitchQuaternion(pitch):
+    """绕 Y 轴的旋转四元数。"""
+    half = pitch * 0.5
+    return (0.0, math.sin(half), 0.0, math.cos(half))
+
+
+# Marker.ARROW 默认沿本地 +X 方向，这里给出三条互相正交的
+# 单位轴 (X/Y/Z) 对应的姿态四元数。
+AXIS_QUATERNIONS = {
+    "x": (0.0, 0.0, 0.0, 1.0),                        # 绕 Z 轴   0°  -> +X
+    "y": yawQuaternion(math.pi / 2.0),                # 绕 Z 轴 +90°  -> +Y
+    "z": pitchQuaternion(-math.pi / 2.0),             # 绕 Y 轴 -90°  -> +Z
+}
+
+
 class ImuVisualizerNode(Node):
     """订阅 IMU 数据并在 RViz2 中显示三维模型实时位姿。"""
 
@@ -91,7 +106,6 @@ class ImuVisualizerNode(Node):
         self.declare_parameter("axis_length", 0.25)
         self.declare_parameter("axis_shaft_diameter", 0.012)
         self.declare_parameter("axis_head_diameter", 0.030)
-        self.declare_parameter("axis_head_length", 0.05)
 
         # 其他
         self.declare_parameter("smoothing", 1.0)          # 1.0=不平滑，越小越平滑
@@ -113,7 +127,6 @@ class ImuVisualizerNode(Node):
         self.axisLength = float(self.get_parameter("axis_length").value)
         self.axisShaftDiameter = float(self.get_parameter("axis_shaft_diameter").value)
         self.axisHeadDiameter = float(self.get_parameter("axis_head_diameter").value)
-        self.axisHeadLength = float(self.get_parameter("axis_head_length").value)
 
         self.smoothing = max(0.01, min(1.0, float(self.get_parameter("smoothing").value)))
         self.markerLifetime = float(self.get_parameter("marker_lifetime").value)
@@ -195,16 +208,16 @@ class ImuVisualizerNode(Node):
         # ---- 主体（mesh 或几何体）----
         markers.markers.append(self.buildBodyMarker(stamp))
 
-        # ---- 三条坐标轴箭头（RGB = XYZ）----
+        # ---- 三条坐标轴箭头（RGB = XYZ，互相正交）----
         if self.showAxes:
             markers.markers.append(
-                self.buildAxisMarker(1, stamp, (1.0, 0.2, 0.2), (0.0, 0.0, 0.0, 1.0))
+                self.buildAxisMarker(1, stamp, (1.0, 0.2, 0.2), AXIS_QUATERNIONS["x"])
             )
             markers.markers.append(
-                self.buildAxisMarker(2, stamp, (0.2, 0.9, 0.2), yawQuaternion(math.pi / 2))
+                self.buildAxisMarker(2, stamp, (0.2, 0.9, 0.2), AXIS_QUATERNIONS["y"])
             )
             markers.markers.append(
-                self.buildAxisMarker(3, stamp, (0.3, 0.5, 1.0), yawQuaternion(-math.pi / 2))
+                self.buildAxisMarker(3, stamp, (0.3, 0.5, 1.0), AXIS_QUATERNIONS["z"])
             )
 
         self.markerPub.publish(markers)
