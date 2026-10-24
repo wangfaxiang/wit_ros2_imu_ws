@@ -24,8 +24,8 @@ class imuDriverNode(Node):
 
         # 参数
         self.declare_parameter("port", "/dev/imu_usb")
-        self.declare_parameter("baudrate", 230400)
-        self.declare_parameter("protocol", "RS485_HIGH")
+        self.declare_parameter("baudrate", 921600)
+        self.declare_parameter("protocol", "TTL_STD")
         self.declare_parameter("modbusID", 0x50)
 
         self.port = self.get_parameter("port").value
@@ -199,6 +199,7 @@ class imuDriverNode(Node):
                 self.gyroData = np.array(values)
             elif dataType == 0x53:
                 self.angleData = np.array(values)
+                self.publishImu()
             elif dataType == 0x54:
                 self.magData = np.array(values)
         else:
@@ -228,7 +229,7 @@ class imuDriverNode(Node):
                 elif axis == 0x03:
                     self.angleData[2] = angle32
         
-        self.publishImu() 
+            self.publishImu() 
 
     # ==========================================================
     # CAN处理
